@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
-from flask import Flask, json, jsonify, render_template, escape, request, redirect, flash, make_response
-from src import db as database
-from wtforms import Form, TextAreaField, validators, StringField, SubmitField
+from setup import app, db
+from flask import render_template, request, redirect, make_response
+from wtforms import Form, validators, StringField
 from src.api import routes, users
-
-app = Flask(__name__)
-app.config.from_object(__name__)
-app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
-
-db = database.Database()
-db.connect()
 
 app.register_blueprint(routes.api)
 

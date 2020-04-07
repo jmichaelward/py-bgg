@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 from flask import jsonify, Blueprint, request
-from src.db import Database
+from setup import db
+from src.api.users import api_handle_collection_add
 
 api = Blueprint('api', __name__)
-
-# @TODO Figure out how to make a shared database instance.
-db = Database()
-db.connect()
-
-from src.api.users import *
 
 
 @api.route('/api/v1/users', methods=['GET'])

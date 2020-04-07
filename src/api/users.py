@@ -1,5 +1,4 @@
 # Users handler.
-from flask import jsonify
 from main import db
 from urllib.request import urlopen
 import xmltodict
