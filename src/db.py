@@ -95,8 +95,9 @@ class Database(object):
         rows = cursor.fetchall()
 
         for row in rows:
-            # See: https://stackoverflow.com/a/60172473/1686528
-            results.append(dict(zip(cursor.column_names, row)))
+            # Modified from https://stackoverflow.com/a/60172473/1686528 to return a list of titles instead of dict.
+            game = dict(zip(cursor.column_names, row))
+            results.append(game['title'])
 
         cursor.close()
 
