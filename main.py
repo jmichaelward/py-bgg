@@ -2,9 +2,10 @@
 from setup import app, db
 from flask import render_template, request, redirect, make_response
 from wtforms import Form, validators, StringField
-from src.api import routes, users
+from src.api import users
+from src.routes import api
 
-app.register_blueprint(routes.api)
+app.register_blueprint(api.routes)
 
 
 class ReusableForm(Form):

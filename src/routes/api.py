@@ -3,10 +3,10 @@ from flask import jsonify, Blueprint, request
 from setup import db
 from src.api.users import api_handle_collection_add
 
-api = Blueprint('api', __name__)
+routes = Blueprint('api', __name__)
 
 
-@api.route('/api/v1/users', methods=['GET'])
+@routes.route('/api/v1/users', methods=['GET'])
 def users():
     """
     Return a collection of users as a JSON object. This displays their username and BoardGameGeek user ID.
@@ -14,7 +14,7 @@ def users():
     return jsonify(db.get_users())
 
 
-@api.route('/api/v1/users/collection', methods=['GET', 'POST'])
+@routes.route('/api/v1/users/collection', methods=['GET', 'POST'])
 def users_collection():
     """
     Get the games collection of a given user.
@@ -27,7 +27,7 @@ def users_collection():
     return jsonify(db.get_user_collection(username))
 
 
-@api.route('/api/v1/games', methods=['GET'])
+@routes.route('/api/v1/games', methods=['GET'])
 def games():
     """
     Get a list of all of the games in the database.
