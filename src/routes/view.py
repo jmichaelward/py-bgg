@@ -50,7 +50,3 @@ def index():
     The main page is just going to show links to the various API routes.
     """
     return render_template('main.html')
-
-
-if __name__ == '__main__':
-    app.run()
