@@ -58,16 +58,13 @@ class Database(object):
         query_string = (""" SELECT `bgg_id`, `username` FROM users WHERE username = '{}' """).format(user)
         cursor.execute(query_string)
 
-        results = []
-        rows = cursor.fetchall()
+        row = cursor.fetchone()
 
-        for row in rows:
-            # See: https://stackoverflow.com/a/60172473/1686528
-            results.append(dict(zip(cursor.column_names, row)))
-
+        # See: https://stackoverflow.com/a/60172473/1686528
+        user = dict(zip(cursor.column_names, row))
         cursor.close()
 
-        return results
+        return user
 
     def create_user(self, user: dict):
         """
