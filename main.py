@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
 from flask import Flask, json, jsonify, render_template, escape, request, redirect, flash
-from src import db as Database
+from src import db
 from src.api.users import api_handle_add
 from wtforms import Form, TextAreaField, validators, StringField, SubmitField
 
-DEBUG = True
+
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
-db = Database.Database()
-db.connect()
+database = db.Database()
+database.connect()
+
+
+def get_db():
+    return database
+
+
+def get_app():
+    return app
 
 
 class ReusableForm(Form):
@@ -48,14 +56,6 @@ def add_users():
         return redirect('/users/' + username)
 
     return render_template('add-user.html', form=form)
-
-
-@app.route('/api/v1/users')
-def users():
-    """
-    Return a collection of users as a JSON object. This displays their username and BoardGameGeek user ID.
-    """
-    return jsonify(db.get_users())
 
 
 @app.route('/users/<username>')
