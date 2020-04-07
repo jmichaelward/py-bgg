@@ -11,7 +11,14 @@ def users():
     """
     Return a collection of users as a JSON object. This displays their username and BoardGameGeek user ID.
     """
-    return jsonify(db.get_users())
+    response = []
+    users = db.get_users()
+
+    for user in users:
+        user.update({"profile": request.host_url + "users/" + user['username']})
+        response.append(user)
+
+    return jsonify(response)
 
 
 @routes.route('/api/v1/users/collection', methods=['GET', 'POST'])
