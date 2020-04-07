@@ -85,3 +85,19 @@ class Database(object):
         finally:
             cursor.close()
             return True
+
+    def get_games(self):
+        cursor = self.connection.cursor(prepared=True)
+        query_string = (""" SELECT * FROM games """)
+        cursor.execute(query_string)
+
+        results = []
+        rows = cursor.fetchall()
+
+        for row in rows:
+            # See: https://stackoverflow.com/a/60172473/1686528
+            results.append(dict(zip(cursor.column_names, row)))
+
+        cursor.close()
+
+        return results
