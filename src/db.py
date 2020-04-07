@@ -76,7 +76,7 @@ class Database(object):
         cursor = self.connection.cursor(prepared=True)
 
         try:
-            query = ("""INSERT INTO users (`bgg_id`, `username`) VALUES (%s, %s)""")
+            query = """INSERT INTO users (`bgg_id`, `username`) VALUES (%s, %s)"""
             cursor.execute(query, (user['id'], user['username']))
             self.connection.commit()
 
@@ -88,7 +88,7 @@ class Database(object):
 
     def get_games(self):
         cursor = self.connection.cursor(prepared=True)
-        query_string = (""" SELECT * FROM games """)
+        query_string = """ SELECT * FROM games """
         cursor.execute(query_string)
 
         results = []
@@ -160,7 +160,7 @@ class Database(object):
         cursor = self.connection.cursor(prepared=True)
 
         try:
-            query_string = ("""
+            query_string = """
                 INSERT IGNORE INTO user_collection (`user_id`, `game_id`)
                 VALUES (
                     (
@@ -174,7 +174,7 @@ class Database(object):
                         LIMIT 1                    
                     )
                 )
-            """)
+            """
             cursor.execute(
                 query_string,
                 (user['id'], game['@objectid'])
