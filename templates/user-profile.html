@@ -1,2 +1,11 @@
 <h1>Profile for {{ user.username }}</h1>
 <h2>BoardGameGeek ID: {{ user.bgg_id }}</h2>
+
+<div>
+    <p>{{ user.username }}'s collection:</p>
+    <ol>
+    {% for game in collection %}
+        <li>{{ game.title }}</li>
+    {% endfor %}
+    </ol>
+</div>
