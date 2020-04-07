@@ -60,10 +60,19 @@ def users():
 
 @app.route('/users/<username>')
 def show_user_profile(username):
+    user = db.get_user(username)
+
+    if 0 == len(user):
+        return render_template('404.html', message="Could not find user: " + username)
     """
     Front-end template for a user page. This could maybe show a list of the user's games?
     """
-    return 'User %s' % escape(username)
+    return render_template('user-profile.html', user=user[0])
+
+
+@app.route('/not-found', methods=['GET'])
+def show_404():
+    return render_template('404.html')
 
 
 @app.route('/')
