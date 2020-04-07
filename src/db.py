@@ -63,15 +63,5 @@ class Database(object):
             cursor.close()
             return True
 
-    def print_user(self, user: str):
-        cursor = self.connection.cursor(prepared=True)
-        query_string = (""" SELECT `bgg_id` FROM users WHERE username = '{}' """).format(user)
-        cursor.execute(query_string)
-
-        for (bgg_id) in cursor:
-            print(bgg_id[0])
-
-            cursor.close()
-
     def disconnect(self):
         self.connection.close()
