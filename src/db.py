@@ -5,6 +5,11 @@ import os
 
 
 class Database(object):
+    """
+    Class for handling database interactions.
+
+    @TODO Specific queries need to move on out of here.
+    """
     connection = None,
 
     def connect(self):
