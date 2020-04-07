@@ -1,26 +1,10 @@
 #!/usr/bin/env python3
-from flask import Blueprint, request, redirect, render_template, make_response
-from setup import app, db
-from wtforms import Form, validators, StringField
+from flask import Blueprint, request, redirect, render_template
+from setup import db
 from src.api import users
+from src.template.form import ReusableForm
 
 routes = Blueprint('view', __name__, template_folder='templates')
-
-class ReusableForm(Form):
-    """
-    @TODO A real reusable form wouldn't go in the main project file.
-    This is based on https://pythonspot.com/flask-web-forms/.
-    """
-    username = StringField('Username:', validators=[validators.required()])
-
-    def __init__(self, form):
-        super(ReusableForm, self).__init__()
-        self.form = form
-
-
-@app.errorhandler(404)
-def show_404(message):
-    return make_response(render_template('404.html', message=message), 404)
 
 
 @routes.route('/add-user', methods=['GET', 'POST'])
