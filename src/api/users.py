@@ -7,8 +7,14 @@ bgg_base_url = 'https://boardgamegeek.com/xmlapi2/'
 
 
 def get_bgg_json(url):
-    request = urlopen(url)
-    return xmltodict.parse(request.read())
+    """
+    Get a JSON response from the BoardGameGeek api.
+
+    :param url:
+    :return:
+    """
+    response = urlopen(url)
+    return response, xmltodict.parse(response.read())
 
 
 def api_handle_add(username: str):
@@ -21,16 +27,15 @@ def api_handle_add(username: str):
             "status": 200
         }
 
-    request = urlopen(bgg_base_url + 'user?name=' + username)
-    data = xmltodict.parse(request.read())
+    response, userdata = get_bgg_json(bgg_base_url + 'user?name=' + username)
 
-    if data['user']['@id'] == '':
+    if userdata['user']['@id'] == '':
         return {"status": 404}
 
     user = {
-        "id": data['user']['@id'],
-        "username": data['user']['@name'],
-        "status": 200
+        "id": userdata['user']['@id'],
+        "username": userdata['user']['@name'],
+        "status": response.code
     }
 
     return user if db.create_user(user) else {"status": 500}
@@ -42,8 +47,8 @@ def api_handle_collection_add(username: str):
     if 200 != user['status']:
         return []  # @TODO User not found - handle more elegantly.
 
-    data = get_bgg_json(bgg_base_url + 'collection?username=' + username)
-    games = data['items']['item']
+    response, userdata = get_bgg_json(bgg_base_url + 'collection?username=' + username)
+    games = userdata['items']['item']
 
     if 0 == len(games):
         return []
