@@ -8,6 +8,9 @@ class Database(object):
     connection = None,
 
     def connect(self):
+        """
+        Connect to the database.
+        """
         load_dotenv()
 
         self.connection = mysql.connector.connect(
@@ -17,7 +20,16 @@ class Database(object):
             database=os.getenv('DB_NAME')
         )
 
+    def disconnect(self):
+        """
+        Disconnect from the database.
+        """
+        self.connection.close()
+
     def get_users(self):
+        """
+        Get all users from the database.
+        """
         cursor = self.connection.cursor(prepared=True)
         query_string = (""" SELECT `bgg_id`, `username` FROM users """)
         cursor.execute(query_string)
@@ -34,6 +46,9 @@ class Database(object):
         return results
 
     def get_user(self, user: str):
+        """
+        Get a single user from the database.
+        """
         cursor = self.connection.cursor(prepared=True)
         query_string = (""" SELECT `bgg_id`, `username` FROM users WHERE username = '{}' """).format(user)
         cursor.execute(query_string)
@@ -50,6 +65,9 @@ class Database(object):
         return results
 
     def create_user(self, user: dict):
+        """
+        Add a new user to the database table.
+        """
         cursor = self.connection.cursor(prepared=True)
 
         try:
@@ -62,6 +80,3 @@ class Database(object):
         finally:
             cursor.close()
             return True
-
-    def disconnect(self):
-        self.connection.close()
