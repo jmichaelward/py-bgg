@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+<nav id="main-nav">
+    <h1>Python BoardGameGeek: Main Nav</h1>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/add-user">Add a User</a></li>
+    </ul>
+</nav>
+<div id="content">{% block content %}{% endblock %}</div>
+</body>
+</html>
