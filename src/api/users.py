@@ -48,6 +48,10 @@ def api_handle_collection_add(username: str):
         return []  # @TODO User not found - handle more elegantly.
 
     response, userdata = get_bgg_json(bgg_base_url + 'collection?username=' + username)
+
+    if 200 != response.code:
+        return get_collection_response(response)
+
     games = userdata['items']['item']
 
     if 0 == len(games):
@@ -60,4 +64,15 @@ def api_handle_collection_add(username: str):
     return db.get_user_collection(username)
 
 
+def get_collection_response(response):
+    """
+    Get an appropriate response for a non-200 response to the /collections endpoint.
+    :param response:
+    :return:
+    """
+    if 202 == response.code:
+        return []  # @TODO Figure out how to handle BGG's response that it's processing user data.
+    elif 404 == response.code:
+        return []  # @TODO Figure out whether this is actually a code BGG returns and what to do in this case.
 
+    return []  # @TODO Figure out whether there are other responses to handle. There certainly are.
