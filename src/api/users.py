@@ -1,5 +1,5 @@
 # Users handler.
-from main import db
+from setup import db
 from urllib.request import urlopen
 import xmltodict
 
