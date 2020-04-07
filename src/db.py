@@ -61,7 +61,7 @@ class Database(object):
         row = cursor.fetchone()
 
         # See: https://stackoverflow.com/a/60172473/1686528
-        user = dict(zip(cursor.column_names, row))
+        user = dict(zip(cursor.column_names, row)) if type(row) is list else {}
         cursor.close()
 
         return user
