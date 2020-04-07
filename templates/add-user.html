@@ -1,0 +1,21 @@
+<!-- Template based on: https://pythonspot.com/flask-web-forms/ -->
+<title>Add BoardGameGeek user</title>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <ul>
+    {% for message in messages %}
+        <li>{{ message[1] }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+{% endwith %}
+
+<form action="" method="post">
+    <div class="input text">
+        {{ form.username.label }}{{ form.username }}
+    </div>
+    <div class="input submit">
+        <input type="submit" value="Submit">
+    </div>
+</form>
