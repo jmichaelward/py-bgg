@@ -15,7 +15,7 @@ At least for now. There may be a case for more properties, but that's the bare m
  */
 CREATE TABLE IF NOT EXISTS `users` (
     id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    bgg_id INT UNSIGNED NOT NULL,
+    bgg_id INT UNSIGNED UNIQUE NOT NULL,
     username VARCHAR(256) NOT NULL
 );
 
@@ -29,7 +29,7 @@ Games should inherit the primary values we care about from BGG.
  */
 CREATE TABLE IF NOT EXISTS `games` (
     id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    bgg_id INT UNSIGNED NOT NULL,
+    bgg_id INT UNSIGNED UNIQUE NOT NULL,
     title VARCHAR(256) NOT NULL
 ) ENGINE = InnoDB;
 
@@ -59,6 +59,8 @@ CREATE TABLE IF NOT EXISTS `user_collection` (
         ON UPDATE RESTRICT
 ) ENGINE = InnoDB;
 
+CREATE UNIQUE INDEX `user_owned_game`
+    ON user_collection (user_id, game_id)
 
  /*
  A table to track user plays. This should contain the following fields:
