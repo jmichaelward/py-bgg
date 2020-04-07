@@ -1,24 +1,17 @@
 #!/usr/bin/env python3
-from flask import Flask, json, jsonify, render_template, escape, request, redirect, flash
-from src import db
-from src.api.users import api_handle_add
+from flask import Flask, json, jsonify, render_template, escape, request, redirect, flash, make_response
+from src import db as database
 from wtforms import Form, TextAreaField, validators, StringField, SubmitField
-
+from src.api import routes, users
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
-database = db.Database()
-database.connect()
+db = database.Database()
+db.connect()
 
-
-def get_db():
-    return database
-
-
-def get_app():
-    return app
+app.register_blueprint(routes.api)
 
 
 class ReusableForm(Form):
@@ -50,7 +43,7 @@ def add_users():
         return render_template('add-user.html', form=form)
 
     username = request.form.get('username')
-    response = api_handle_add(username)
+    response = users.api_handle_add(username)
 
     if 200 == response['status']:
         return redirect('/users/' + username)
@@ -70,9 +63,9 @@ def show_user_profile(username):
     return render_template('user-profile.html', user=user[0])
 
 
-@app.route('/not-found', methods=['GET'])
-def show_404():
-    return render_template('404.html')
+@app.errorhandler(404)
+def show_404(message):
+    return make_response(render_template('404.html', message=message), 404)
 
 
 @app.route('/')

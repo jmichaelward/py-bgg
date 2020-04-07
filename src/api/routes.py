@@ -1,12 +1,13 @@
-from flask import jsonify
-import main
+#!/usr/bin/env python3
+from flask import jsonify, Blueprint
 
-app = main.get_app()
-db = main.get_db()
+api = Blueprint('api', __name__)
 
 
-@app.route('/api/v1/users', methods=['GET'])
+@api.route('/api/v1/users', methods=['GET'])
 def users():
+    from main import db
+
     """
     Return a collection of users as a JSON object. This displays their username and BoardGameGeek user ID.
     """

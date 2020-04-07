@@ -1,6 +1,6 @@
 # Users handler.
 from flask import jsonify
-from src import db as database
+from main import db
 from urllib.request import urlopen
 import xmltodict
 
@@ -8,10 +8,6 @@ bgg_base_url = 'https://boardgamegeek.com/xmlapi2/'
 
 
 def api_handle_add(username: str):
-    # Check for database presence
-    db = database.Database()
-    db.connect()
-
     user = db.get_user(username)
 
     if len(user) > 0:
