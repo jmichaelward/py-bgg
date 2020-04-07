@@ -50,4 +50,8 @@ def index():
     """
     The main page is just going to show links to the various API routes.
     """
-    return render_template('main.html')
+    app = {
+        "title": "Python BoardGameGeek!"
+    }
+
+    return render_template('main.html', app=app)

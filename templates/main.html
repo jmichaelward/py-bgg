@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Python BoardGameGeek!</title>
+    <title>{{ app.title }}</title>
 </head>
 <body>
-<h1>Python BoardGameGeek!</h1>
-<p>Here are some API endpoints you can check out:</p>
-<ul>
-    <li><a href="/api/v1/users">Users</a></li>
-</ul>
+<h1>{{ app.title }}</h1>
+<div>
+    <p>Here are some web views:</p>
+    <nav>
+        <li><a href="/add-user">Add User to the database</a></li>
+    </nav>
 
-<p>More to come!</p>
+</div>
+<nav>
+    <p>And here are some API endpoints you can check out:</p>
+    <ul>
+        <li><a href="/api/v1/users">Users</a></li>
+        <li><a href="/api/v1/games">Games</a></li>
+    </ul>
+</nav>
+
+<div>
+    <p>For now, the only way to create a user's collection is to send a POST request to
+    /api/v1/users/collection, with a key of "username" and a value of the BoardGameGeek username of
+    the user whose collection you'd like to download.
+    </p>
+    <p>This, of course, will change with time. More to come!</p>
+</div>
 
 </body>
 </html>
