@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from flask_wtf import FlaskForm
-from wtforms import StringField
+from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 
 
@@ -13,6 +13,7 @@ class AddUserForm(FlaskForm):
     up the server.
     """
     username = StringField('Username:', validators=[DataRequired()])
+    submit = SubmitField('Add User')
 
     def __init__(self, form):
         super(AddUserForm, self).__init__()

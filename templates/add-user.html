@@ -18,7 +18,7 @@
         {{ form.username.label }}{{ form.username }}
     </div>
     <div class="input submit">
-        <input type="submit" value="Submit">
+        <p>{{ form.submit() }}</p>
     </div>
 </form>
 {% endblock %}
