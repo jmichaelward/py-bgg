@@ -22,7 +22,7 @@ def users():
 
 
 @routes.route('/api/v1/users/<username>')
-def user(username: str):
+def get_user(username: str):
     """
     Get information about a given user.
     """
