@@ -32,6 +32,11 @@ def add_users():
     return render_template('add-user.html', form=form)
 
 
+@routes.route('/users/')
+def show_users():
+    return render_template('users.html', users=db.get_users())
+
+
 @routes.route('/users/<username>')
 def show_user_profile(username):
     user = db.get_user(username)
