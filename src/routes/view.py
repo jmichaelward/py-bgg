@@ -3,6 +3,7 @@ from flask import Blueprint, request, redirect, render_template
 from setup import db
 from src.api import users
 from src.template.form import AddUserForm
+from src.api.users import api_handle_collection_add
 
 routes = Blueprint('view', __name__, template_folder='templates')
 
@@ -44,10 +45,15 @@ def show_user_profile(username):
     if 0 == len(user):
         return render_template('404.html', message="Could not find user: " + username)
 
+    collection = db.get_user_collection(user['username'])
+
+    if 0 == len(collection):
+        collection = api_handle_collection_add(username)
+
     """
     Front-end template for a user page. This could maybe show a list of the user's games?
     """
-    return render_template('user-profile.html', user=user, collection=db.get_user_collection(user['username']))
+    return render_template('user-profile.html', user=user, collection=collection)
 
 
 @routes.route('/')
