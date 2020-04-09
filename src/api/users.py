@@ -29,7 +29,7 @@ def api_handle_add(username: str):
 
     response, userdata = get_bgg_json(bgg_base_url + 'user?name=' + username)
 
-    if userdata['user']['@id'] == '':
+    if not userdata['user']['@id']:
         return {"status": 404}
 
     user = {
