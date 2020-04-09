@@ -21,6 +21,19 @@ def users():
     return jsonify(response)
 
 
+@routes.route('/api/v1/users/<username>')
+def user(username: str):
+    """
+    Get information about a given user.
+    """
+    user = db.get_user(username)
+
+    if 0 == len(user):
+        return jsonify([])  # @TODO Implement 404.
+
+    return jsonify(db.get_user(username))
+
+
 @routes.route('/api/v1/users/<username>/collection', methods=['GET', 'POST'])
 def users_collection(username: str):
     """
