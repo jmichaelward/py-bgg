@@ -29,9 +29,11 @@ def get_user(username: str):
     user = db.get_user(username)
 
     if 0 == len(user):
-        return jsonify([])  # @TODO Implement 404.
+        return jsonify({})  # @TODO Implement 404.
 
-    return jsonify(db.get_user(username))
+    user.update({"bgg_profile": "https://boardgamegeek.com/user/" + user['username']})
+
+    return jsonify(user)
 
 
 @routes.route('/api/v1/users/<username>/collection', methods=['GET', 'POST'])
