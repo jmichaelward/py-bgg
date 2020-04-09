@@ -2,7 +2,7 @@
 from flask import Blueprint, request, redirect, render_template
 from setup import db
 from src.api import users
-from src.template.form import ReusableForm
+from src.template.form import AddUserForm
 
 routes = Blueprint('view', __name__, template_folder='templates')
 
@@ -18,7 +18,7 @@ def add_users():
     The "request" is just a connection to the database, which also makes a call to BoardGameGeek behind
     the scenes of a record is not present in the database.
     """
-    form = ReusableForm(request.form)
+    form = AddUserForm(request.form)
 
     if request.method == 'GET':
         return render_template('add-user.html', form=form)

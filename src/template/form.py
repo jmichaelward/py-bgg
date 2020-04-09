@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-from wtforms import Form, validators, StringField
+from flask_wtf import FlaskForm
+from wtforms import StringField
+from wtforms.validators import DataRequired
 
 
-class ReusableForm(Form):
+class AddUserForm(FlaskForm):
     """
     Reusable form mockup.
 
@@ -10,8 +12,8 @@ class ReusableForm(Form):
     investigate other solutions. The wtforms module is throwing some warning messages when starting
     up the server.
     """
-    username = StringField('Username:', validators=[validators.required()])
+    username = StringField('Username:', validators=[DataRequired()])
 
     def __init__(self, form):
-        super(ReusableForm, self).__init__()
+        super(AddUserForm, self).__init__()
         self.form = form
