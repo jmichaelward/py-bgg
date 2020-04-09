@@ -56,6 +56,12 @@ def show_user_profile(username):
     return render_template('user-profile.html', user=user, collection=collection)
 
 
+@routes.route('/games')
+def show_games():
+    games = db.get_games()
+    return render_template('games.html', games=sorted(games))
+
+
 @routes.route('/')
 def index():
     """
