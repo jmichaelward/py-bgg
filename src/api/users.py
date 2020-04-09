@@ -20,7 +20,7 @@ def get_bgg_json(url):
 def api_handle_add(username: str):
     user = db.get_user(username)
 
-    if len(user) == 1:
+    if user:
         return {
             "id": user[0]['bgg_id'],
             "username": user[0]['username'],
