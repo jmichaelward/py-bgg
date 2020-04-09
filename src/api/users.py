@@ -1,6 +1,6 @@
 # Users handler.
 from setup import db
-from urllib.request import urlopen
+import requests
 import xmltodict
 
 bgg_base_url = 'https://boardgamegeek.com/xmlapi2/'
@@ -13,8 +13,8 @@ def get_bgg_json(url):
     :param url:
     :return:
     """
-    response = urlopen(url)
-    return response, xmltodict.parse(response.read())
+    response = requests.request('GET', url)
+    return response, xmltodict.parse(response.content)
 
 
 def api_handle_add(username: str):
@@ -35,7 +35,7 @@ def api_handle_add(username: str):
     user = {
         "id": userdata['user']['@id'],
         "username": userdata['user']['@name'],
-        "status": response.code
+        "status": response.status_code
     }
 
     return user if db.create_user(user) else {"status": 500}
@@ -49,7 +49,7 @@ def api_handle_collection_add(username: str):
 
     response, userdata = get_bgg_json(bgg_base_url + 'collection?username=' + username)
 
-    if 200 != response.code:
+    if 200 != response.status_code:
         return get_collection_response(response)
 
     games = userdata['items']['item'] if "item" in userdata['items'] else []
@@ -70,9 +70,9 @@ def get_collection_response(response):
     :param response:
     :return:
     """
-    if 202 == response.code:
+    if 202 == response.status_code:
         return []  # @TODO Figure out how to handle BGG's response that it's processing user data.
-    elif 404 == response.code:
+    elif 404 == response.status_code:
         return []  # @TODO Figure out whether this is actually a code BGG returns and what to do in this case.
 
     return []  # @TODO Figure out whether there are other responses to handle. There certainly are.
