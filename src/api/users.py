@@ -52,7 +52,7 @@ def api_handle_collection_add(username: str):
     if 200 != response.code:
         return get_collection_response(response)
 
-    games = userdata['items']['item']
+    games = userdata['items']['item'] if "item" in userdata['items'] else []
 
     if 0 == len(games):
         return []
