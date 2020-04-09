@@ -21,13 +21,11 @@ def users():
     return jsonify(response)
 
 
-@routes.route('/api/v1/users/collection', methods=['GET', 'POST'])
-def users_collection():
+@routes.route('/api/v1/users/<username>/collection', methods=['GET', 'POST'])
+def users_collection(username: str):
     """
     Get the games collection of a given user.
     """
-    username = request.args.get('username')
-
     if 'POST' == request.method:
         return jsonify(api_handle_collection_add(username))
 
