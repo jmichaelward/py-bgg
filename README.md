@@ -22,3 +22,10 @@ where I left off should I switch between development environments.
 5. Start the app by running `./main.py` (if you did step 4) or `python3 main.py` if you didn't.
 6. You should be able to visit http://127.0.0.1:5000 to see the main page, or http://127.0.0.1:5000/add-user to 
     add a user to the database (that's pretty much it thus far, jas of 4/6/20).
+    
+    
+### Helpful Resources
+Figured I might as well log some helpful resources I come across during my journey in this project.
+
+1. [The Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
+
