@@ -22,8 +22,8 @@ def api_handle_add(username: str):
 
     if user:
         return {
-            "id": user[0]['bgg_id'],
-            "username": user[0]['username'],
+            "id": user['bgg_id'],
+            "username": user['username'],
             "status": 200
         }
 
