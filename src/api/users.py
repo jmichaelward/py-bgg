@@ -1,5 +1,7 @@
 # Users handler.
-from setup import db
+from app import db
+from sqlalchemy import exc
+from src.model.user import User
 import requests
 import xmltodict
 
@@ -18,27 +20,25 @@ def get_bgg_json(url):
 
 
 def api_handle_add(username: str):
-    user = db.get_user(username)
+    user = User.query.get(username)
 
-    if user:
-        return {
-            "id": user['bgg_id'],
-            "username": user['username'],
-            "status": 200
-        }
+    if isinstance(user, User):
+        return user
 
     response, userdata = get_bgg_json(bgg_base_url + 'user?name=' + username)
 
     if not userdata['user']['@id']:
         return {"status": 404}
 
-    user = {
-        "id": userdata['user']['@id'],
-        "username": userdata['user']['@name'],
-        "status": response.status_code
-    }
+    user = User(username=userdata['user']['@name'], bgg_id=userdata['user']['@id'])
 
-    return user if db.create_user(user) else {"status": 500}
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except exc.IntegrityError:  # Ignore duplicate entries.
+        return user
+
+    return user
 
 
 def api_handle_collection_add(username: str):
