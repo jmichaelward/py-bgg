@@ -1,11 +1,32 @@
 #!/usr/bin/env python3
-from flask import Blueprint, request, redirect, render_template
-from setup import db
+from flask import request, redirect, render_template
+from flask.views import MethodView
+from flask_smorest import Blueprint, abort
+from app import db
+from src.model.user import User, UserSchema, UserQueryArgsSchema
 from src.api import users
 from src.template.form import AddUserForm
 from src.api.users import api_handle_collection_add
 
 routes = Blueprint('view', __name__, template_folder='templates')
+user_routes = Blueprint('users', 'users',
+                        url_prefix='/users', description='Operations on users', template_folder='templates')
+
+
+@user_routes.route('/')
+class Users(MethodView):
+    def get(self):
+        """List users."""
+        return render_template('users.html', users=User.query.all())
+
+
+@user_routes.route('/<username>')
+class UsersById(MethodView):
+    def get(self, username: str):
+        """Get User by username"""
+        user = db.session.query(User).filter(User.username == username).one()
+
+        return render_template('user-profile.html', user=user, collection=[])
 
 
 @routes.route('/add-user', methods=['GET', 'POST'])
@@ -27,41 +48,37 @@ def add_users():
     username = request.form.get('username')
     response = users.api_handle_add(username)
 
-    if 200 == response['status']:
+    if isinstance(response, User):
         return redirect('/users/' + username)
 
     return render_template('add-user.html', form=form)
 
 
-@routes.route('/users/')
-def show_users():
-    return render_template('users.html', users=db.get_users())
-
-
-@routes.route('/users/<username>')
-def show_user_profile(username):
-    user = db.get_user(username)
-
-    if 0 == len(user):
-        return render_template('404.html', message="Could not find user: " + username)
-
-    collection = db.get_user_collection(user['username'])
-
-    if 0 == len(collection):
-        collection = api_handle_collection_add(username)
-
-    """
-    Front-end template for a user page. This could maybe show a list of the user's games?
-    """
-    return render_template('user-profile.html', user=user, collection=collection)
-
-
-@routes.route('/games')
-def show_games():
-    games = db.get_games()
-    return render_template('games.html', games=sorted(games))
-
-
+# @routes.route('/users/<username>')
+# def show_user_profile(username):
+#     user = User.query.get(username)
+#
+#     if not isinstance(user, User):
+#         return render_template('404.html', message="Could not find user: " + username)
+#
+#     # @TODO Fix collection processing with new database ORM.
+#     # collection = db.get_user_collection(user['username'])
+#     #
+#     # if 0 == len(collection):
+#     #     collection = api_handle_collection_add(username)
+#
+#     """
+#     Front-end template for a user page. This could maybe show a list of the user's games?
+#     """
+#     return render_template('user-profile.html', user=user, collection=[])
+#
+#
+# @routes.route('/games')
+# def show_games():
+#     games = db.get_games()
+#     return render_template('games.html', games=sorted(games))
+#
+#
 @routes.route('/')
 def index():
     """
