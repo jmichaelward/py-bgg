@@ -2,6 +2,7 @@
 from app import db
 from sqlalchemy import exc
 from src.model.user import User
+from src.model.game import Game
 import requests
 import xmltodict
 
@@ -20,7 +21,7 @@ def get_bgg_json(url):
 
 
 def api_handle_add(username: str):
-    user = User.query.get(username)
+    user = db.session.query(User).filter(User.username == username).one_or_none()
 
     if isinstance(user, User):
         return user
@@ -44,7 +45,7 @@ def api_handle_add(username: str):
 def api_handle_collection_add(username: str):
     user = api_handle_add(username)
 
-    if 200 != user['status']:
+    if not isinstance(user, User):
         return []  # @TODO User not found - handle more elegantly.
 
     response, userdata = get_bgg_json(bgg_base_url + 'collection?username=' + username)
@@ -57,11 +58,21 @@ def api_handle_collection_add(username: str):
     if 0 == len(games):
         return []
 
-    for game in games:
-        db.create_game(game)
-        db.add_game_to_collection(game, user)
+    collection = []
 
-    return db.get_user_collection(username)
+    for game in games:
+        new_game = Game(bgg_id=game['@objectid'], title=game['name']['#text'])
+        collection.append(new_game)
+
+    try:
+        db.session.add_all(collection)
+        db.session.close()
+        db.session.commit()
+    except exc.IntegrityError:
+        print('something')
+
+# return db.get_user_collection(username)
+    return collection
 
 
 def get_collection_response(response):

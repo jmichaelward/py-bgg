@@ -31,8 +31,9 @@ class UsersById(MethodView):
         """Get User by username"""
         try:
             user = db.session.query(User).filter(User.username == username).one()
+            collection = api_handle_collection_add(user.username)
 
-            return render_template('user-profile.html', user=user, collection=[])
+            return render_template('user-profile.html', user=user, collection=collection)
         except error.NoResultFound:
             return render_template('404.html', message="Could not find user: " + username)
 
