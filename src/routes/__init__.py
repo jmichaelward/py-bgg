@@ -10,4 +10,5 @@ def load(app: Flask):
     app.register_blueprint(api.routes)
     app.register_blueprint(view.routes)
     app.register_blueprint(view.user_routes)
+    app.register_blueprint(view.game_routes)
 

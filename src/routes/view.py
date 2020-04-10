@@ -3,7 +3,8 @@ from flask import request, redirect, render_template
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from app import db
-from src.model.user import User, UserSchema, UserQueryArgsSchema
+from src.model.user import User
+from src.model.game import Game
 from src.api import users
 from src.template.form import AddUserForm
 from src.api.users import api_handle_collection_add
@@ -11,6 +12,8 @@ from src.api.users import api_handle_collection_add
 routes = Blueprint('view', __name__, template_folder='templates')
 user_routes = Blueprint('users', 'users',
                         url_prefix='/users', description='Operations on users', template_folder='templates')
+game_routes = Blueprint('games', 'games', url_prefix='/games', description='Operations on games',
+                        template_folder='templates')
 
 
 @user_routes.route('/')
@@ -27,6 +30,13 @@ class UsersById(MethodView):
         user = db.session.query(User).filter(User.username == username).one()
 
         return render_template('user-profile.html', user=user, collection=[])
+
+
+@game_routes.route('/')
+class Games(MethodView):
+    def get(self):
+        """List games."""
+        return render_template('games.html', games=Game.query.all())
 
 
 @routes.route('/add-user', methods=['GET', 'POST'])
@@ -73,12 +83,7 @@ def add_users():
 #     return render_template('user-profile.html', user=user, collection=[])
 #
 #
-# @routes.route('/games')
-# def show_games():
-#     games = db.get_games()
-#     return render_template('games.html', games=sorted(games))
-#
-#
+
 @routes.route('/')
 def index():
     """
