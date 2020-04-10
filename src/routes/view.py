@@ -8,6 +8,8 @@ from src.model.game import Game
 from src.api import users
 from src.template.form import AddUserForm
 from src.api.users import api_handle_collection_add
+import sqlalchemy.orm.exc as error
+
 
 routes = Blueprint('view', __name__, template_folder='templates')
 user_routes = Blueprint('users', 'users',
@@ -27,9 +29,31 @@ class Users(MethodView):
 class UsersById(MethodView):
     def get(self, username: str):
         """Get User by username"""
-        user = db.session.query(User).filter(User.username == username).one()
+        try:
+            user = db.session.query(User).filter(User.username == username).one()
 
-        return render_template('user-profile.html', user=user, collection=[])
+            return render_template('user-profile.html', user=user, collection=[])
+        except error.NoResultFound:
+            return render_template('404.html', message="Could not find user: " + username)
+
+
+# @routes.route('/users/<username>')
+# def show_user_profile(username):
+#     user = User.query.get(username)
+#
+#     if not isinstance(user, User):
+#         return render_template('404.html', message="Could not find user: " + username)
+#
+#     # @TODO Fix collection processing with new database ORM.
+#     # collection = db.get_user_collection(user['username'])
+#     #
+#     # if 0 == len(collection):
+#     #     collection = api_handle_collection_add(username)
+#
+#     """
+#     Front-end template for a user page. This could maybe show a list of the user's games?
+#     """
+#     return render_template('user-profile.html', user=user, collection=[])
 
 
 @game_routes.route('/')
@@ -63,26 +87,6 @@ def add_users():
 
     return render_template('add-user.html', form=form)
 
-
-# @routes.route('/users/<username>')
-# def show_user_profile(username):
-#     user = User.query.get(username)
-#
-#     if not isinstance(user, User):
-#         return render_template('404.html', message="Could not find user: " + username)
-#
-#     # @TODO Fix collection processing with new database ORM.
-#     # collection = db.get_user_collection(user['username'])
-#     #
-#     # if 0 == len(collection):
-#     #     collection = api_handle_collection_add(username)
-#
-#     """
-#     Front-end template for a user page. This could maybe show a list of the user's games?
-#     """
-#     return render_template('user-profile.html', user=user, collection=[])
-#
-#
 
 @routes.route('/')
 def index():
