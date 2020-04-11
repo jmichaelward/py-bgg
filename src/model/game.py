@@ -13,9 +13,13 @@ class Game(db.Model):
 
 
 class GameSchema(Schema):
-    bgg_id = fields.Int()
-    title = fields.Str()
+    class Meta:
+        fields = ('id', 'bgg_id', 'title')
 
 
 class GameQueryArgsSchema(Schema):
     title = fields.String()
+
+
+game_schema = GameSchema()
+games_schema = GameSchema(many=True)

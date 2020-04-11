@@ -13,9 +13,13 @@ class User(db.Model):
 
 
 class UserSchema(Schema):
-    bgg_id = fields.Int()
-    username = fields.Str()
+    class Meta:
+        fields = ('id', 'bgg_id', 'username')
 
 
 class UserQueryArgsSchema(Schema):
     username = fields.String()
+
+
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
