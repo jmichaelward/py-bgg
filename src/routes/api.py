@@ -8,7 +8,7 @@ from src.api.users import api_handle_collection_add
 routes = Blueprint('api', __name__)
 
 
-@routes.route('/api/v1/users', methods=['GET'])
+@routes.route('/api/v1/users/', methods=['GET'])
 def get_users():
     """
     Return a collection of users as a JSON object. This displays their username and BoardGameGeek user ID.
@@ -18,7 +18,7 @@ def get_users():
     return jsonify(users_schema.dump(users)) if users else jsonify(message="No users found."), 404
 
 
-@routes.route('/api/v1/users/<username>')
+@routes.route('/api/v1/users/<username>/')
 def get_user(username: str):
     """
     Get information about a given user.
@@ -31,7 +31,7 @@ def get_user(username: str):
     return jsonify(user_schema.dump(user))
 
 
-@routes.route('/api/v1/users/<username>/collection', methods=['GET', 'POST'])
+@routes.route('/api/v1/users/<username>/collection/', methods=['GET', 'POST'])
 def users_collection(username: str):
     """
     Get the games collection of a given user.
@@ -42,14 +42,14 @@ def users_collection(username: str):
     return jsonify(db.get_user_collection(username))
 
 
-@routes.route('/api/v1/games/<string:title>', methods=['GET'])
+@routes.route('/api/v1/games/<string:title>/', methods=['GET'])
 def get_game_by_title(title: str):
     game = Game.query.filter_by(title=title).first()
 
     return jsonify(game_schema.dump(game)) if game else jsonify(message="No game found by title: " + title), 404
 
 
-@routes.route('/api/v1/games', methods=['GET'])
+@routes.route('/api/v1/games/', methods=['GET'])
 def get_games():
     """
     Get a list of all of the games in the database.
