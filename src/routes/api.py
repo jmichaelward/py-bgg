@@ -3,7 +3,7 @@ from flask import jsonify, Blueprint, request
 from app import db
 from src.model.user import User, user_schema, users_schema
 from src.model.game import Game, game_schema, games_schema
-from src.api.users import api_handle_collection_add
+from src.api.users import api_handle_collection_add, get_collection
 
 routes = Blueprint('api', __name__)
 
@@ -36,10 +36,15 @@ def users_collection(username: str):
     """
     Get the games collection of a given user.
     """
-    if 'POST' == request.method:
-        return jsonify(api_handle_collection_add(username))
+    user = User.query.filter_by(username=username).first()
 
-    return jsonify(db.get_user_collection(username))
+    if not user:
+        return jsonify(message="No user exists by username " + username), 404
+
+    if 'POST' == request.method:
+        return jsonify(api_handle_collection_add(user))
+
+    return jsonify(user=user_schema.dump(user), collection=get_collection(user))
 
 
 @routes.route('/api/v1/games/<string:title>/', methods=['GET'])

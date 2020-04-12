@@ -7,7 +7,7 @@ from src.model.user import User
 from src.model.game import Game
 from src.api import users
 from src.template.form import AddUserForm
-from src.api.users import api_handle_collection_add
+from src.api.users import get_collection
 import sqlalchemy.orm.exc as error
 
 
@@ -31,7 +31,7 @@ class UsersById(MethodView):
         """Get User by username"""
         try:
             user = db.session.query(User).filter(User.username == username).one()
-            collection = api_handle_collection_add(user.username)
+            collection = get_collection(user)
 
             return render_template('user-profile.html', user=user, collection=collection)
         except error.NoResultFound:

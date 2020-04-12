@@ -1,7 +1,7 @@
 # Users handler.
 from app import db
 from sqlalchemy import exc
-from src.model.user import User
+from src.model.user import User, games_collection
 from src.model.game import Game
 import requests
 import xmltodict
@@ -42,13 +42,13 @@ def api_handle_add(username: str):
     return user
 
 
-def api_handle_collection_add(username: str):
-    user = api_handle_add(username)
+def api_handle_collection_add(user: User):
+    collection = get_collection(user)
 
-    if not isinstance(user, User):
-        return []  # @TODO User not found - handle more elegantly.
+    if collection:
+        return collection
 
-    response, userdata = get_bgg_json(bgg_base_url + 'collection?username=' + username)
+    response, userdata = get_bgg_json(bgg_base_url + 'collection?username=' + user.username)
 
     if 200 != response.status_code:
         return get_collection_response(response)
@@ -58,21 +58,36 @@ def api_handle_collection_add(username: str):
     if 0 == len(games):
         return []
 
-    collection = []
-
     for game in games:
-        new_game = Game(bgg_id=game['@objectid'], title=game['name']['#text'])
-        collection.append(new_game)
+        new_game = create_game(Game(bgg_id=game['@objectid'], title=game['name']['#text']))
+        add_to_collection(user, new_game)
 
-    try:
-        db.session.add_all(collection)
-        db.session.close()
-        db.session.commit()
-    except exc.IntegrityError:
-        print('something')
+    return get_collection(user)
 
-# return db.get_user_collection(username)
-    return collection
+
+def get_collection(user: User):
+    return db.session.query(Game).join(games_collection).filter_by(user_id=user.id).all()
+
+
+def add_to_collection(user: User, game: Game):
+    if not db.session.query(games_collection).filter_by(user_id=user.id).filter_by(game_id=game.id).first():
+        games_collection.update().values(user_id=user.id, game_id=game.id)
+
+
+def create_game(game: Game):
+    """
+    Insert a game into the database.
+    """
+    existing_game = Game.query.filter_by(bgg_id=game.bgg_id).first()
+
+    if existing_game:
+        return existing_game
+
+    db.session.add(game)
+    db.session.commit()
+    db.session.close()
+
+    return game
 
 
 def get_collection_response(response):

@@ -12,6 +12,10 @@ games_collection = Table(
     Column('game_id', Integer, ForeignKey('game.id'), primary_key=True)
 )
 
+class UserGameCollectionSchema(Schema):
+    class Meta:
+        fields = ('id', 'user_id', 'game_id', 'title')
+
 
 class User(db.Model):
     id = Column(Integer, primary_key=True)
@@ -35,3 +39,4 @@ class UserSchema(Schema):
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+games_collection_schema = UserGameCollectionSchema()
