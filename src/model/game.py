@@ -4,6 +4,7 @@ from marshmallow import Schema, fields
 
 
 class Game(db.Model):
+    __tablename__ = 'games'
     id = db.Column(db.Integer, primary_key=True)
     bgg_id = db.Column(db.Integer, index=True, unique=True, nullable=False)
     title = db.Column(db.String(256), index=True, unique=True, nullable=False)

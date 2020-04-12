@@ -4,6 +4,7 @@ from marshmallow import Schema, fields
 
 
 class User(db.Model):
+    __tablename__  = 'users'
     id = db.Column(db.Integer, primary_key=True)
     bgg_id = db.Column(db.Integer, index=True, unique=True, nullable=False)
     username = db.Column(db.String(256), index=True, unique=True, nullable=False)
