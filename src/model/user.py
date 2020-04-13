@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, String, and_
 from sqlalchemy.orm import relationship, backref
 from .user_game_collection import user_game_collection, UserGameCollectionSchema
 from .game import Game
+from src.bgg_api import BggApi
 
 
 class User(db.Model):
@@ -23,16 +24,37 @@ class User(db.Model):
             user_game_collection
         ).filter(user_game_collection.c.user_id == self.id).all()
 
+    def update_collection(self):
+        response, userdata = BggApi().get_json('collection?username=' + self.username)
+
+        if 200 != response.status_code:
+            return
+
+        games = userdata['items']['item'] if "item" in userdata['items'] else []
+
+        if 0 == len(games):
+            return
+
+        for game in games:
+            new_game = Game(bgg_id=game['@objectid'], title=game['name']['#text'])
+            created = new_game.create_record()
+
+            if not isinstance(created, Game):
+                continue
+
+            self.add_to_collection(created)
+
     def add_to_collection(self, game: Game):
-        if game and self.has_game(game):
+        if game and not self.has_game(game):
             self.add_game_to_user_collection(game)
 
     def add_game_to_user_collection(self, game: Game):
-        db.session.execute(
+        result = db.session.execute(
             user_game_collection.insert(), {"user_id": self.id, "game_id": game.id}
         )
 
         db.session.commit()
+        return result
 
     def has_game(self, game: Game):
         return db.session.execute(

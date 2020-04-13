@@ -43,6 +43,8 @@ class UsersByUsername(MethodView):
         if not user:
             return self.get_404_response(username)
 
+        user.update_collection()
+
         return render_template('user-profile.html', user=user, collection=user.get_collection())
 
     def get_from_db(self, username: str):
