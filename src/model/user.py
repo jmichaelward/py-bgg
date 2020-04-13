@@ -4,6 +4,7 @@ from marshmallow import Schema
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship, backref
 from .user_game_collection import user_game_collection, UserGameCollectionSchema
+from .game import Game
 
 
 class User(db.Model):
@@ -16,6 +17,11 @@ class User(db.Model):
         secondary=user_game_collection,
         backref=backref('user')
     )
+
+    def get_collection(self):
+        return Game.query.join(
+            user_game_collection
+        ).filter(user_game_collection.c.user_id == self.id).all()
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

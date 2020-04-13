@@ -6,7 +6,6 @@ from src.bgg_api import BggApi
 from src.model.user import User, user_schema, users_schema, user_game_collection, games_collection_schema
 from src.template.form import create_form_from_request
 from src.routes.view import template_routes
-from src.routes.users_collection import get_collection
 import sqlalchemy.orm.exc as error
 
 
@@ -36,9 +35,7 @@ class UsersByUsername(MethodView):
         if not user:
             return self.get_404_response(username)
 
-        collection = get_collection(user)
-
-        return render_template('user-profile.html', user=user, collection=collection)
+        return render_template('user-profile.html', user=user, collection=user.get_collection())
 
     def post(self, username: str):
         user = self.get_from_db(username)
@@ -46,9 +43,7 @@ class UsersByUsername(MethodView):
         if not user:
             return self.get_404_response(username)
 
-        collection = get_collection(user)
-
-        return render_template('user-profile.html', user=user, collection=collection)
+        return render_template('user-profile.html', user=user, collection=user.get_collection())
 
     def get_from_db(self, username: str):
         return db.session.query(User).filter(User.username == username).one_or_none()

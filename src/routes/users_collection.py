@@ -27,9 +27,7 @@ class UserGamesCollection(MethodView):
         if not user:
             return jsonify(message="No user exists by username " + username), 404
 
-        collection = get_collection(user)
-
-        return jsonify(user=user_schema.dump(user), collection=games_schema.dump(collection))
+        return jsonify(user=user_schema.dump(user), collection=games_schema.dump(user.get_collection()))
 
     def post(self, username: str):
         user = User.query.filter_by(username=username).first()
@@ -37,9 +35,9 @@ class UserGamesCollection(MethodView):
         if not user:
             return jsonify(message="No user exists by username " + username), 404
 
-        collection = update_collection(user)
+        update_collection(user)
 
-        return jsonify(user=user_schema.dump(user), collection=games_schema.dump(collection))
+        return jsonify(user=user_schema.dump(user), collection=games_schema.dump(user.get_collection()))
 
 
 def add_to_collection(user: User, game: Game):
@@ -91,13 +89,7 @@ def update_collection(user: User):
         new_game = create_game(Game(bgg_id=game['@objectid'], title=game['name']['#text']))
         add_to_collection(user, new_game)
 
-    return get_collection(user)
-
-
-def get_collection(user: User):
-    return Game.query.join(
-        user_game_collection
-    ).filter(user_game_collection.c.user_id == user.id).all()
+    return user.get_collection()
 
 
 def get_collection_response(response):
