@@ -18,10 +18,10 @@ where I left off should I switch between development environments.
     fill in your local database credentials.
 2. Create a new MariaDB database named `py-bgg` and import the `database-setup.sql` file.
 3. Run `pip3 install -r requirements.txt` to download dependencies.
-4. Consider making the main.py file executable with `chmod +x main.py` (Optional)
-5. Start the app by running `./main.py` (if you did step 4) or `python3 main.py` if you didn't.
-6. You should be able to visit http://127.0.0.1:5000 to see the main page, or http://127.0.0.1:5000/add-user to 
-    add a user to the database (that's pretty much it thus far, jas of 4/6/20).
+4. Run `flask db upgrade` to run the database migration steps.
+5. Flask should recognize the app.py file in the root of the project. Run the project with `flask run`.
+6. You should be able to visit http://127.0.0.1:5000 to see the main page, which includes links to creating user data,
+    viewing users, and viewing imported games.
     
     
 ### Helpful Resources
