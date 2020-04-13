@@ -12,6 +12,7 @@ games_collection = Table(
     Column('game_id', Integer, ForeignKey('game.id'), primary_key=True)
 )
 
+
 class UserGameCollectionSchema(Schema):
     class Meta:
         fields = ('id', 'user_id', 'game_id', 'title')
