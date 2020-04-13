@@ -6,7 +6,6 @@ from src.bgg_api import BggApi
 from src.model.user import User, user_schema, user_game_collection, games_collection_schema
 from src.model.game import Game, games_schema
 from flask_smorest import Blueprint
-from sqlalchemy import and_
 
 api = Blueprint('users_collection_api', 'users_collection_api',
                 url_prefix='/api/v1/collection', description='Users Collection API')
@@ -41,7 +40,7 @@ class UserGamesCollection(MethodView):
         response, userdata = BggApi().get_json('collection?username=' + user.username)
 
         if 200 != response.status_code:
-            return get_collection_response(response)
+            return []
 
         games = userdata['items']['item'] if "item" in userdata['items'] else []
 
@@ -49,70 +48,8 @@ class UserGamesCollection(MethodView):
             return []
 
         for game in games:
-            new_game = create_game(Game(bgg_id=game['@objectid'], title=game['name']['#text']))
-            add_to_collection(user, new_game)
+            new_game = Game(bgg_id=game['@objectid'], title=game['name']['#text'])
+            new_game.create_record()
+            user.add_game_to_collection(new_game)
 
         return user.get_collection()
-
-
-def add_to_collection(user: User, game: Game):
-    if not user and game:
-        return jsonify(message="Could not find both user and game"), 404
-
-    if user_has_game(user, game):
-        return jsonify(message="User " + user.username + " already has game " + game.title + " in collection."), 200
-
-    if add_game_to_user_collection(user, game):
-        return jsonify(message="successfully added " + game.title + " to collection for " + user.username), 200
-
-    return jsonify(message="Failed to add user for some unknown reason."), 503
-
-
-def user_has_game(user: User, game: Game):
-    return db.session.execute(
-        user_game_collection.select().where(
-            and_(
-                user_game_collection.c.user_id == user.id,
-                user_game_collection.c.game_id == game.id
-            )
-        )
-    ).fetchone()
-
-
-def add_game_to_user_collection(user: User, game: Game):
-    result = db.session.execute(
-        user_game_collection.insert(), {"user_id": user.id, "game_id": game.id}
-    )
-
-    db.session.commit()
-
-    return result
-
-
-def get_collection_response(response):
-    """
-    Get an appropriate response for a non-200 response to the /collections endpoint.
-    :param response:
-    :return:
-    """
-    if 202 == response.status_code:
-        return []  # @TODO Figure out how to handle BGG's response that it's processing user data.
-    elif 404 == response.status_code:
-        return []  # @TODO Figure out whether this is actually a code BGG returns and what to do in this case.
-
-    return []  # @TODO Figure out whether there are other responses to handle. There certainly are.
-
-
-def create_game(game: Game):
-    """
-    Insert a game into the database.
-    """
-    existing_game = Game.query.filter_by(bgg_id=game.bgg_id).first()
-
-    if existing_game:
-        return existing_game
-
-    db.session.add(game)
-    db.session.commit()
-
-    return game

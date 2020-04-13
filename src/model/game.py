@@ -9,6 +9,20 @@ class Game(db.Model):
     bgg_id = Column(Integer, index=True, unique=True, nullable=False)
     title = Column(db.String(256), index=True, unique=True, nullable=False)
 
+    def create_record(self):
+        """
+        Insert a game into the database.
+        """
+        existing_game = Game.query.filter_by(bgg_id=self.bgg_id).first()
+
+        if existing_game:
+            return existing_game
+
+        db.session.add(self)
+        db.session.commit()
+
+        return self
+
     def __repr__(self):
         return '<Game {}>'.format(self.title)
 
