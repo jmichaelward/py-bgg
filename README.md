@@ -14,9 +14,10 @@ also so I have a version-controlled place where I can pick up
 where I left off should I switch between development environments.
 
 ### If for some reason you want to follow along
-1. Copy the .env.example file to .env in the same directory and 
-    fill in your local database credentials.
-2. Create a new MariaDB database named `py-bgg` and import the `database-setup.sql` file.
+1. Copy the .env.example file to .env in the same directory.
+2. Enter a value for FLASK_SECRET_KEY in .env. If you'd like to use a database other than sqlite, enter
+    the URL and credentials for your database into the DB_URL field.
+2. Create a new MariaDB database named `py-bgg`.
 3. Run `pip3 install -r requirements.txt` to download dependencies.
 4. Run `flask db upgrade` to run the database migration steps.
 5. Flask should recognize the app.py file in the root of the project. Run the project with `flask run`.
