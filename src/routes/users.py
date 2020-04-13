@@ -27,17 +27,34 @@ class Users(MethodView):
         return render_template('users.html', users=User.query.all())
 
 
-@view.route('/<username>/')
-class UsersById(MethodView):
+@view.route('/<username>/', methods=['GET', 'POST'])
+class UsersByUsername(MethodView):
     def get(self, username: str):
         """Get User by username"""
-        try:
-            user = db.session.query(User).filter(User.username == username).one()
-            collection = get_collection(user)
+        user = self.get_from_db(username)
 
-            return render_template('user-profile.html', user=user, collection=collection)
-        except error.NoResultFound:
-            return render_template('404.html', message="Could not find user: " + username)
+        if not user:
+            return self.get_404_response(username)
+
+        collection = get_collection(user)
+
+        return render_template('user-profile.html', user=user, collection=collection)
+
+    def post(self, username: str):
+        user = self.get_from_db(username)
+
+        if not user:
+            return self.get_404_response(username)
+
+        collection = get_collection(user)
+
+        return render_template('user-profile.html', user=user, collection=collection)
+
+    def get_from_db(self, username: str):
+        return db.session.query(User).filter(User.username == username).one_or_none()
+
+    def get_404_response(self, username):
+        return render_template('404.html', message="Could not find user: " + username)
 
 
 @template_routes.route('/add-user/', methods=['GET', 'POST'])
@@ -47,14 +64,20 @@ class UsersAdd(MethodView):
 
     def post(self):
         username = request.form.get('username')
-        response = self.handle_add(username)
+        user = self.handle_add(username)
 
-        if isinstance(response, User):
-            return redirect('/users/' + username)
+        if isinstance(user, User):
+            return redirect('/users/' + username + '/'), 307
 
         return render_template('add-user.html', form=create_form_from_request(request))
 
     def handle_add(self, username: str):
+        """
+        Handle adding of the user record.
+
+        :param username:
+        :return:
+        """
         user = db.session.query(User).filter(User.username == username).one_or_none()
 
         if isinstance(user, User):
@@ -89,7 +112,7 @@ class UsersApi(MethodView):
         return jsonify(users_schema.dump(users)) if users else jsonify(message="No users found."), 404
 
 
-@api.route('/<username>', methods=['GET'])
+@api.route('/<username>/', methods=['GET'])
 class UsersApiGetByUsername(MethodView):
     def get(self, username: str):
         """
