@@ -1,45 +1,62 @@
 #!/usr/bin/env python3
 from app import app, db
-from flask import jsonify, request
+from flask import jsonify
+from flask.views import MethodView
 from src.bgg_api import BggApi
-from src.model.user import User, user_schema, users_schema, user_game_collection, games_collection_schema
-from src.model.game import Game
+from src.model.user import User, user_schema, user_game_collection, games_collection_schema
+from src.model.game import Game, games_schema
 from flask_smorest import Blueprint
 from sqlalchemy import and_
 
 api = Blueprint('users_collection_api', 'users_collection_api',
-                url_prefix='/api/v1/collection/', description='Users Collection API')
+                url_prefix='/api/v1/collection', description='Users Collection API')
 
 
 def register_routes():
     app.register_blueprint(api)
 
 
-@api.route('/', methods=['GET', 'POST'])
-def users_collection(username: str):
-    """
-    Get the games collection of a given user.
-    """
-    user = User.query.filter_by(username=username).first()
+@api.route('/<string:username>', methods=['GET', 'POST'])
+class UserGamesCollection(MethodView):
+    def get(self, username: str):
+        """
+        Get the games collection of a given user.
+        """
+        user = User.query.filter_by(username=username).first()
 
-    if not user:
-        return jsonify(message="No user exists by username " + username), 404
+        if not user:
+            return jsonify(message="No user exists by username " + username), 404
 
-    if 'POST' == request.method:
-        return jsonify(api_handle_collection_add(user))
+        collection = get_collection(user)
 
-    return jsonify(user=user_schema.dump(user), collection=get_collection(user))
+        return jsonify(user=user_schema.dump(user), collection=games_schema.dump(collection))
+
+    def post(self, username: str):
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            return jsonify(message="No user exists by username " + username), 404
+
+        collection = update_collection(user)
+
+        return jsonify(user=user_schema.dump(user), collection=games_collection_schema.dump(collection))
 
 
-@api.route('/<string:username>/add/<int:game_id>', methods=['POST'])
-def add_to_collection(username: str, game_id: int):
-    user = User.query.filter(User.username == username).first()
-    game = Game.query.filter(Game.id == game_id).first()
-
+def add_to_collection(user: User, game: Game):
     if not user and game:
         return jsonify(message="Could not find both user and game"), 404
 
-    user_game = db.session.execute(
+    if user_has_game(user, game):
+        return jsonify(message="User " + user.username + " already has game " + game.title + " in collection."), 200
+
+    if add_game_to_user_collection(user, game):
+        return jsonify(message="successfully added " + game.title + " to collection for " + user.username), 200
+
+    return jsonify(message="Failed to add user for some unknown reason."), 503
+
+
+def user_has_game(user: User, game: Game):
+    return db.session.execute(
         user_game_collection.select().where(
             and_(
                 user_game_collection.c.user_id == user.id,
@@ -48,26 +65,18 @@ def add_to_collection(username: str, game_id: int):
         )
     ).fetchone()
 
-    if user_game:
-        return jsonify(message="User " + user.username + " already has game " + game.title + " in collection."), 200
 
+def add_game_to_user_collection(user: User, game: Game):
     result = db.session.execute(
         user_game_collection.insert(), {"user_id": user.id, "game_id": game.id}
     )
+
     db.session.commit()
 
-    if result:
-        return jsonify(message="successfully added " + game.title + " to collection for " + user.username), 200
-
-    return jsonify(message="Failed to add user for some unknown reason."), 503
+    return result
 
 
-def api_handle_collection_add(user: User):
-    collection = get_collection(user)
-
-    if collection:
-        return collection
-
+def update_collection(user: User):
     response, userdata = BggApi().get_json('collection?username=' + user.username)
 
     if 200 != response.status_code:
@@ -86,12 +95,9 @@ def api_handle_collection_add(user: User):
 
 
 def get_collection(user: User):
-    return db.session.query(Game).join(user_game_collection).filter_by(user_id=user.id).all()
-
-
-def add_to_collection(user: User, game: Game):
-    if not db.session.query(user_game_collection).filter_by(user_id=user.id).filter_by(game_id=game.id).first():
-        user_game_collection.update().values(user_id=user.id, game_id=game.id)
+    return Game.query.join(
+        user_game_collection
+    ).filter(user_game_collection.c.user_id == user.id).all()
 
 
 def get_collection_response(response):
@@ -119,6 +125,5 @@ def create_game(game: Game):
 
     db.session.add(game)
     db.session.commit()
-    db.session.close()
 
     return game
