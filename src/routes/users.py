@@ -2,11 +2,11 @@ from app import db, app
 from flask import jsonify, request, render_template, redirect
 from flask.views import MethodView
 from flask_smorest import Blueprint
-from src.model.user import User, user_schema, users_schema, games_collection, games_collection_schema
-from src.api.users import get_collection
+from src.bgg_api import BggApi
+from src.model.user import User, user_schema, users_schema, user_game_collection, games_collection_schema
 from src.template.form import AddUserForm
 from src.routes.view import template_routes
-from src.api.users import bgg_base_url, get_bgg_json
+from src.routes.users_collection import get_collection
 import sqlalchemy.orm.exc as error
 
 
@@ -63,7 +63,7 @@ class UsersAdd(MethodView):
         if isinstance(user, User):
             return user
 
-        response, userdata = get_bgg_json(bgg_base_url + 'user?name=' + username)
+        response, userdata = BggApi().get_json('user?name=' + username)
 
         if not userdata['user']['@id']:
             return {"status": 404}

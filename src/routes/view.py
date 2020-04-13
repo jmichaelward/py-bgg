@@ -3,7 +3,7 @@ from app import app
 from flask import render_template
 from flask_smorest import Blueprint
 
-template_routes = Blueprint('view', __name__, template_folder='templates')
+template_routes = Blueprint('view', __name__, url_prefix='/', template_folder='templates')
 
 
 def register_routes():

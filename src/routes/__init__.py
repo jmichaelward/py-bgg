@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-from . import view, users, games
+from . import view, users, games, users_collection
 
 
 modules = [
     view,
     users,
-    games
+    games,
+    users_collection
 ]
 
 

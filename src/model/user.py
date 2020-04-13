@@ -1,21 +1,9 @@
 #!/usr/bin/env python3
 from app import db
 from marshmallow import Schema
-from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship, backref
-
-
-games_collection = Table(
-    'user_game_collection',
-    db.Model.metadata,
-    Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
-    Column('game_id', Integer, ForeignKey('game.id'), primary_key=True)
-)
-
-
-class UserGameCollectionSchema(Schema):
-    class Meta:
-        fields = ('id', 'user_id', 'game_id', 'title')
+from .user_game_collection import user_game_collection, UserGameCollectionSchema
 
 
 class User(db.Model):
@@ -25,7 +13,7 @@ class User(db.Model):
 
     user_game_collection = relationship(
         'Game',
-        secondary=games_collection,
+        secondary=user_game_collection,
         backref=backref('user')
     )
 
