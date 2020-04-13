@@ -13,6 +13,13 @@ import src.routes
 import src.model
 
 
+@app.shell_context_processor
+def make_shell_context():
+    from src.model.user import User
+    from src.model.game import Game
+    return {'db': db, 'User': User, 'Game': Game}
+
+
 @app.errorhandler(404)
 def show_404(message):
     return make_response(render_template('404.html', message=message), 404)
