@@ -4,6 +4,10 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 
 
+def create_form_from_request(request):
+    return AddUserForm(request.form)
+
+
 class AddUserForm(FlaskForm):
     """
     Reusable form mockup.
