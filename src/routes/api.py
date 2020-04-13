@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from flask import jsonify, Blueprint, request
 from app import db
-from src.model.user import User, user_schema, users_schema
+from src.model.user import User, user_schema, users_schema, games_collection, games_collection_schema
 from src.model.game import Game, game_schema, games_schema
 from src.api.users import api_handle_collection_add, get_collection
+import sqlalchemy.exc
 
 routes = Blueprint('api', __name__)
 
@@ -62,3 +63,25 @@ def get_games():
     games = Game.query.all()
 
     return jsonify(games_schema.dump(games)) if games else jsonify("No games found."), 404
+
+
+@routes.route('/api/v1/add_to_collection/', methods=['POST'])
+def add_to_collection():
+    user = User.query.filter(User.id == request.form['user']).first()
+    game = Game.query.filter(Game.id == request.form['game']).first()
+
+    if not user and game:
+        return jsonify(message="Could not find both user and game"), 404
+
+    try:
+        result = db.session.execute(
+            games_collection.insert(), {"user_id": user.id, "game_id": game.id}
+        )
+        db.session.commit()
+
+        if result:
+            return jsonify(message="successfully added " + game.title + " to collection for " + user.username), 200
+    except sqlalchemy.exc.IntegrityError:
+        return jsonify(message="User " + user.username + " already has game " + game.title + " in collection."), 200
+
+    return jsonify(message="Failed to add user for some unknown reason."), 401
