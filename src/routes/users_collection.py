@@ -16,7 +16,7 @@ def register_routes():
     app.register_blueprint(api)
 
 
-@api.route('/<string:username>', methods=['GET', 'POST'])
+@api.route('/<string:username>/', methods=['GET', 'POST'])
 class UserGamesCollection(MethodView):
     def get(self, username: str):
         """
