@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-from flask import Flask
+from . import view, users, games
 
 
-def load(app: Flask):
-    """Load application routes."""
-    from . import api
-    from . import view
+modules = [
+    view,
+    users,
+    games
+]
 
-    app.register_blueprint(api.routes)
-    app.register_blueprint(view.routes)
-    app.register_blueprint(view.user_routes)
-    app.register_blueprint(view.game_routes)
 
+def load_modules():
+    for module in modules:
+        module.register_routes()
+
+
+load_modules()

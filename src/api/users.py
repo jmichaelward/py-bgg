@@ -20,28 +20,6 @@ def get_bgg_json(url):
     return response, xmltodict.parse(response.content)
 
 
-def api_handle_add(username: str):
-    user = db.session.query(User).filter(User.username == username).one_or_none()
-
-    if isinstance(user, User):
-        return user
-
-    response, userdata = get_bgg_json(bgg_base_url + 'user?name=' + username)
-
-    if not userdata['user']['@id']:
-        return {"status": 404}
-
-    user = User(username=userdata['user']['@name'], bgg_id=userdata['user']['@id'])
-
-    try:
-        db.session.add(user)
-        db.session.commit()
-    except exc.IntegrityError:  # Ignore duplicate entries.
-        return user
-
-    return user
-
-
 def api_handle_collection_add(user: User):
     collection = get_collection(user)
 
