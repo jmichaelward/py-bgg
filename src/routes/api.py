@@ -4,6 +4,7 @@ from app import db
 from src.model.user import User, user_schema, users_schema, games_collection, games_collection_schema
 from src.model.game import Game, game_schema, games_schema
 from src.api.users import api_handle_collection_add, get_collection
+from sqlalchemy import and_
 import sqlalchemy.exc
 
 routes = Blueprint('api', __name__)
@@ -73,15 +74,24 @@ def add_to_collection():
     if not user and game:
         return jsonify(message="Could not find both user and game"), 404
 
-    try:
-        result = db.session.execute(
-            games_collection.insert(), {"user_id": user.id, "game_id": game.id}
+    user_game = db.session.execute(
+        games_collection.select().where(
+            and_(
+                games_collection.c.user_id == user.id,
+                games_collection.c.game_id == game.id
+            )
         )
-        db.session.commit()
+    ).fetchone()
 
-        if result:
-            return jsonify(message="successfully added " + game.title + " to collection for " + user.username), 200
-    except sqlalchemy.exc.IntegrityError:
+    if user_game:
         return jsonify(message="User " + user.username + " already has game " + game.title + " in collection."), 200
 
-    return jsonify(message="Failed to add user for some unknown reason."), 401
+    result = db.session.execute(
+        games_collection.insert(), {"user_id": user.id, "game_id": game.id}
+    )
+    db.session.commit()
+
+    if result:
+        return jsonify(message="successfully added " + game.title + " to collection for " + user.username), 200
+
+    return jsonify(message="Failed to add user for some unknown reason."), 503
