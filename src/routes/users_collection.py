@@ -35,9 +35,24 @@ class UserGamesCollection(MethodView):
         if not user:
             return jsonify(message="No user exists by username " + username), 404
 
-        update_collection(user)
+        return jsonify(user=user_schema.dump(user), collection=games_schema.dump(self.update(user)))
 
-        return jsonify(user=user_schema.dump(user), collection=games_schema.dump(user.get_collection()))
+    def update(self, user: User):
+        response, userdata = BggApi().get_json('collection?username=' + user.username)
+
+        if 200 != response.status_code:
+            return get_collection_response(response)
+
+        games = userdata['items']['item'] if "item" in userdata['items'] else []
+
+        if 0 == len(games):
+            return []
+
+        for game in games:
+            new_game = create_game(Game(bgg_id=game['@objectid'], title=game['name']['#text']))
+            add_to_collection(user, new_game)
+
+        return user.get_collection()
 
 
 def add_to_collection(user: User, game: Game):
@@ -72,24 +87,6 @@ def add_game_to_user_collection(user: User, game: Game):
     db.session.commit()
 
     return result
-
-
-def update_collection(user: User):
-    response, userdata = BggApi().get_json('collection?username=' + user.username)
-
-    if 200 != response.status_code:
-        return get_collection_response(response)
-
-    games = userdata['items']['item'] if "item" in userdata['items'] else []
-
-    if 0 == len(games):
-        return []
-
-    for game in games:
-        new_game = create_game(Game(bgg_id=game['@objectid'], title=game['name']['#text']))
-        add_to_collection(user, new_game)
-
-    return user.get_collection()
 
 
 def get_collection_response(response):
