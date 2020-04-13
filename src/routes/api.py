@@ -66,10 +66,10 @@ def get_games():
     return jsonify(games_schema.dump(games)) if games else jsonify("No games found."), 404
 
 
-@routes.route('/api/v1/add_to_collection/', methods=['POST'])
-def add_to_collection():
-    user = User.query.filter(User.id == request.form['user']).first()
-    game = Game.query.filter(Game.id == request.form['game']).first()
+@routes.route('/api/v1/users/<string:username>/collection/add/<int:game_id>', methods=['POST'])
+def add_to_collection(username: str, game_id: int):
+    user = User.query.filter(User.username == username).first()
+    game = Game.query.filter(Game.id == game_id).first()
 
     if not user and game:
         return jsonify(message="Could not find both user and game"), 404
