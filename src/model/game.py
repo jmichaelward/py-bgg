@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer
 class Game(db.Model):
     id = Column(Integer, primary_key=True)
     bgg_id = Column(Integer, index=True, unique=True, nullable=False)
-    title = Column(db.String(256), index=True, unique=True, nullable=False)
+    title = Column(db.String(256), index=True, nullable=False)
 
     def create_record(self):
         """
