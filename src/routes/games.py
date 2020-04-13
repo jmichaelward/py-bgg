@@ -29,7 +29,7 @@ def get_games():
     """
     games = Game.query.all()
 
-    return jsonify(games_schema.dump(games)) if games else jsonify("No games found."), 404
+    return jsonify(games_schema.dump(games)) if games else jsonify(message="No games found."), 404
 
 
 @view.route('/')
