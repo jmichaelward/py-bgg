@@ -39,7 +39,7 @@ class UserGamesCollection(MethodView):
 
         collection = update_collection(user)
 
-        return jsonify(user=user_schema.dump(user), collection=games_collection_schema.dump(collection))
+        return jsonify(user=user_schema.dump(user), collection=games_schema.dump(collection))
 
 
 def add_to_collection(user: User, game: Game):
