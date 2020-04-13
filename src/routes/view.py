@@ -38,25 +38,6 @@ class UsersById(MethodView):
             return render_template('404.html', message="Could not find user: " + username)
 
 
-# @routes.route('/users/<username>')
-# def show_user_profile(username):
-#     user = User.query.get(username)
-#
-#     if not isinstance(user, User):
-#         return render_template('404.html', message="Could not find user: " + username)
-#
-#     # @TODO Fix collection processing with new database ORM.
-#     # collection = db.get_user_collection(user['username'])
-#     #
-#     # if 0 == len(collection):
-#     #     collection = api_handle_collection_add(username)
-#
-#     """
-#     Front-end template for a user page. This could maybe show a list of the user's games?
-#     """
-#     return render_template('user-profile.html', user=user, collection=[])
-
-
 @game_routes.route('/')
 class Games(MethodView):
     def get(self):
