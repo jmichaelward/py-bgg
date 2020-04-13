@@ -57,6 +57,31 @@ class UsersByUsername(MethodView):
         return render_template('404.html', message="Could not find user: " + username)
 
 
+@api.route('/', methods=['GET'])
+class UsersApi(MethodView):
+    def get(self):
+        """
+        Return a collection of users as a JSON object. This displays their username and BoardGameGeek user ID.
+        """
+        users = User.query.all()
+
+        return jsonify(users_schema.dump(users)) if users else jsonify(message="No users found."), 404
+
+
+@api.route('/<username>/', methods=['GET'])
+class UsersApiGetByUsername(MethodView):
+    def get(self, username: str):
+        """
+        Get information about a given user.
+        """
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            return jsonify(message="No user exists for username: " + username), 404
+
+        return jsonify(user_schema.dump(user))
+
+
 @template_routes.route('/add-user/', methods=['GET', 'POST'])
 class UsersAdd(MethodView):
     def get(self):
@@ -99,28 +124,3 @@ class UsersAdd(MethodView):
         db.session.commit()
 
         return user
-
-
-@api.route('/', methods=['GET'])
-class UsersApi(MethodView):
-    def get(self):
-        """
-        Return a collection of users as a JSON object. This displays their username and BoardGameGeek user ID.
-        """
-        users = User.query.all()
-
-        return jsonify(users_schema.dump(users)) if users else jsonify(message="No users found."), 404
-
-
-@api.route('/<username>/', methods=['GET'])
-class UsersApiGetByUsername(MethodView):
-    def get(self, username: str):
-        """
-        Get information about a given user.
-        """
-        user = User.query.filter_by(username=username).first()
-
-        if not user:
-            return jsonify(message="No user exists for username: " + username), 404
-
-        return jsonify(user_schema.dump(user))
