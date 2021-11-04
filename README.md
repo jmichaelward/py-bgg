@@ -1,6 +1,6 @@
 I <3 Python.
 
-This project is exploratory only. It's purpose is to:
+This project is exploratory only. Its purpose is to:
 
 1. Help reacquaint myself with database schema design.
 2. Learn how Python interacts with the database layer.
